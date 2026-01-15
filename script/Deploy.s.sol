@@ -12,17 +12,27 @@ contract DeployTirraDelegate is Script {
     // Known stablecoin addresses per chain
     mapping(uint256 => address) public USDC;
     mapping(uint256 => address) public USDT;
+    mapping(uint256 => address) public cNGN;
 
     function setUp() public {
-        // Base Mainnet
+        // Base Mainnet (8453)
         USDC[8453] = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+        cNGN[8453] = 0x46C85152bFe9f96829aA94755D9f915F9B10EF5F;
 
-        // Polygon Mainnet
+        // Polygon Mainnet (137)
         USDC[137] = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
-        USDT[137] = 0xc2132D05D31c914a87C6611C10748AEb04B58e8F;
+        cNGN[137] = 0x52828daa48C1a9A06F37500882b42daf0bE04C3B;
 
-        // Base Sepolia (testnet)
-        // Add testnet addresses as needed
+        // Celo Mainnet (42220)
+        USDC[42220] = 0xcebA9300f2b948710d2653dD7B07f33A8B32118C;
+        cNGN[42220] = 0xE2702Bd97ee33c88c8f6f92DA3B733608aa76F71; // Fixed checksum
+
+        // Lisk L2 (1135)
+        USDC[1135] = 0x3b1ac69368eb6447F5db2d4E1641380Fa9e40d29; // Corrected address
+        cNGN[1135] = 0x999E3A32eF3F9EAbF133186512b5F29fADB8a816;
+
+        // Assetchain (42420)
+        cNGN[42420] = 0x7923C0f6FA3d1BA6EAFCAedAaD93e737Fd22FC4F;
     }
 
     function run() public {
@@ -40,39 +50,9 @@ contract DeployTirraDelegate is Script {
         uint256 chainId = block.chainid;
         console2.log("Chain ID:", chainId);
 
-        // Add USDC if available on this chain
-        if (USDC[chainId] != address(0)) {
-            delegate.setAllowedToken(USDC[chainId], true);
-            delegate.setAllowedTarget(USDC[chainId], true);
-            delegate.setAllowedSelector(
-                USDC[chainId],
-                bytes4(keccak256("transfer(address,uint256)")),
-                true
-            );
-            delegate.setAllowedSelector(
-                USDC[chainId],
-                bytes4(keccak256("approve(address,uint256)")),
-                true
-            );
-            console2.log("USDC allowlisted:", USDC[chainId]);
-        }
-
-        // Add USDT if available on this chain
-        if (USDT[chainId] != address(0)) {
-            delegate.setAllowedToken(USDT[chainId], true);
-            delegate.setAllowedTarget(USDT[chainId], true);
-            delegate.setAllowedSelector(
-                USDT[chainId],
-                bytes4(keccak256("transfer(address,uint256)")),
-                true
-            );
-            delegate.setAllowedSelector(
-                USDT[chainId],
-                bytes4(keccak256("approve(address,uint256)")),
-                true
-            );
-            console2.log("USDT allowlisted:", USDT[chainId]);
-        }
+        _allowlistToken(delegate, USDC[chainId], "USDC");
+        _allowlistToken(delegate, USDT[chainId], "USDT");
+        _allowlistToken(delegate, cNGN[chainId], "cNGN");
 
         vm.stopBroadcast();
 
@@ -81,6 +61,37 @@ contract DeployTirraDelegate is Script {
         console2.log("TirraDelegate:", address(delegate));
         console2.log("Owner:", owner);
         console2.log("Treasury:", treasury);
+    }
+
+    function _allowlistToken(
+        TirraDelegate delegate,
+        address token,
+        string memory symbol
+    ) internal {
+        if (token != address(0)) {
+            // Check if address has code
+            if (token.code.length == 0) {
+                console2.log(
+                    string.concat("Skipping ", symbol, ": No code at address"),
+                    token
+                );
+                return;
+            }
+
+            delegate.setAllowedToken(token, true);
+            delegate.setAllowedTarget(token, true);
+            delegate.setAllowedSelector(
+                token,
+                bytes4(keccak256("transfer(address,uint256)")),
+                true
+            );
+            delegate.setAllowedSelector(
+                token,
+                bytes4(keccak256("approve(address,uint256)")),
+                true
+            );
+            console2.log(string.concat(symbol, " allowlisted:"), token);
+        }
     }
 }
 

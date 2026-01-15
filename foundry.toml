@@ -17,9 +17,15 @@ base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
 polygon_amoy = "${POLYGON_AMOY_RPC_URL}"
 base = "${BASE_RPC_URL}"
 polygon = "${POLYGON_RPC_URL}"
+celo = "${CELO_RPC_URL}"
+lisk = "${LISK_RPC_URL}"
+assetchain = "${ASSETCHAIN_RPC_URL}"
 
 [etherscan]
 base = { key = "${BASESCAN_API_KEY}" }
 polygon = { key = "${POLYGONSCAN_API_KEY}" }
+celo = { key = "${CELOSCAN_API_KEY}" }
+lisk = { key = "empty", url = "https://blockscout.lisk.com/api" }
+assetchain = { key = "empty", url = "https://scan.assetchain.org/api" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

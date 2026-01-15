@@ -1,2 +1,23 @@
-*/.env
+# Foundry
+out/
+cache/
+broadcast/
+dist/
+
+# Environment variables
 .env
+.env.local
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+
+# IDEs
+.idea/
+.vscode/
+.DS_Store
+
+# Logs
+yarn-error.log
+npm-debug.log
